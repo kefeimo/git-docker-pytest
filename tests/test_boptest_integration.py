@@ -81,16 +81,6 @@ def boptest_sever():
     print(client.containers.list())
 
 
-# @pytest.mark.skip(reason="for local testing. Assuming a local testcase is running")
-class TestDummy:
-    """
-    Testing BopTestSimIntegrationLocal
-    """
-
-    def test_dummy(self):
-        print("This is a dummy test")
-
-
 def test_boptest_server_fixture(boptest_sever):
     print(boptest_sever)
 
@@ -109,3 +99,11 @@ def test_get_name(boptest_sever):
 
 
 
+# @pytest.mark.skip(reason="for local testing. Assuming a local testcase is running")
+class TestDummy:
+    """
+    Testing BopTestSimIntegrationLocal
+    """
+
+    def test_dummy(self):
+        print("This is a dummy test")
