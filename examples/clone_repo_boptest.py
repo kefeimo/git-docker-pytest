@@ -16,7 +16,7 @@ def is_git_repo(path):
         return False
 
 
-def get_random_dir():
+def _get_random_dir():
     return "/tmp/random-repo" + str(uuid.uuid4())
 
 
@@ -27,7 +27,7 @@ def retrieve_valid_repo_path(repo_dir: str, git_url: str, retry=5):
                 print(f"{repo_dir} is a valid repo dir")
                 return repo_dir
             else:
-                repo_dir_new = get_random_dir()
+                repo_dir_new = _get_random_dir()
                 print(f"{repo_dir} is NOT a valid repo dir, trying new dir {repo_dir_new}")
                 return retrieve_valid_repo_path(repo_dir_new, git_url, retry-1)
 
