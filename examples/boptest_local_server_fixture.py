@@ -31,7 +31,7 @@ def _retrieve_valid_venv_path(venv_dir: str, venv_name: str = ".venv", retry=5):
             else:
                 repo_dir_new = _get_random_dir()
                 print(f"{venv_dir} is NOT a valid venv dir, trying new dir {repo_dir_new}")
-                return _retrieve_valid_venv_path(repo_dir_new, venv_name, retry-1)
+                return _retrieve_valid_venv_path(repo_dir_new, venv_name, retry - 1)
 
         else:
             cmd = f"python -m venv {venv_name} {venv_dir}/{venv_name}"
@@ -96,7 +96,6 @@ def install_dependency(venv_dir: str, lib_name: str, version: str = "", constrai
         print(line)
 
 
-
 def is_git_repo(path):
     try:
         _ = git.Repo(path).git_dir
@@ -118,7 +117,7 @@ def retrieve_valid_repo_path(repo_dir: str, git_url: str, retry=5):
             else:
                 repo_dir_new = _get_random_dir()
                 print(f"{repo_dir} is NOT a valid repo dir, trying new dir {repo_dir_new}")
-                return retrieve_valid_repo_path(repo_dir_new, git_url, retry-1)
+                return retrieve_valid_repo_path(repo_dir_new, git_url, retry - 1)
 
         else:
             repo = Repo.clone_from(git_url, repo_dir)
@@ -126,7 +125,8 @@ def retrieve_valid_repo_path(repo_dir: str, git_url: str, retry=5):
             print(f"{repo_dir} NOT exist, clone from {git_url}")
             return repo.git_dir
 
-def start_boptest_server(repo_dir: str, compose_file_path: str, testcase_name = "testcase1"):
+
+def start_boptest_server(repo_dir: str, testcase_name="testcase1"):
     """
     Start a boptest server/container, then return the container id
     """
@@ -146,7 +146,6 @@ def start_boptest_server(repo_dir: str, compose_file_path: str, testcase_name = 
     print(f"Executing command `{cmd}`")
     print(res)
 
-
     print(f"client.containers.list()")
     print(client.containers.list())
     # assuming only one boptest container is running
@@ -159,17 +158,16 @@ def start_boptest_server(repo_dir: str, compose_file_path: str, testcase_name = 
     return container.id
 
 
-
-    # container = client.containers.get("project1-boptest_boptest_1")
-    # print(container.attrs)
-    #
-    # print("==sleeping==")
-    # sleep(5)
-    # cmd = f"docker-compose --file {compose_file_path} down"
-    # res = subprocess.check_output(cmd.split(" "), env=my_env)
-    # print(res)
-    # print(f"client.containers.list()")
-    # print(client.containers.list())
+def stop_boptest_server(repo_dir: str):
+    """
+    Stop a boptest server/container, return docker-compose stdout
+    """
+    compose_file_path = os.path.join(repo_dir, "docker-compose.yml")
+    cmd = f"docker-compose --file {compose_file_path} down"
+    res = subprocess.check_output(cmd.split(" "))
+    print(f"Executing command `{cmd}`")
+    print(res)
+    return res
 
 
 if __name__ == "__main__":
@@ -180,12 +178,7 @@ if __name__ == "__main__":
     # print(get_bin_path(venv_path))
 
     print(install_dependency(venv_dir=venv_path, lib_name="docker-compose"))  # docker-compose==1.29.2
-    print(install_dependency(venv_dir=venv_path, lib_name="GitPython"))  # GitPython==3.1.32
-
-    # res = check_dependency(venv_dir=venv_path, lib_name="GitPython")
-    # print(res)
-    # res = check_dependency(venv_dir=venv_path, lib_name="docker-compose")
-    # print(res)
+    # print(install_dependency(venv_dir=venv_path, lib_name="GitPython"))  # GitPython==3.1.32
 
     ## git clone
     git_url = "https://github.com/ibpsa/project1-boptest.git"
@@ -196,5 +189,11 @@ if __name__ == "__main__":
     print(retrieve_valid_repo_path(repo_dir=repo_dir, git_url=git_url))
 
     ## start boptest
-    start_boptest_server(repo_dir=repo_dir, compose_file_path=repo_dir, testcase_name="testcase1")
+    container_id = start_boptest_server(repo_dir=repo_dir, testcase_name="testcase1")
+    container = client.containers.get(container_id)
+    print(container.attrs)
 
+    sleep(5)
+
+    ## stop boptest
+    stop_boptest_server(repo_dir=repo_dir)
