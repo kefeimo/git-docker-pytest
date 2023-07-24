@@ -31,6 +31,8 @@ GitPython="~3.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=6.2.4"
+docker = "~6.1"
+GitPython="~3.1"
 #pytest-cov = ">=3.0.0"
 #pytest-env = ">0.0.0"
 #black = ">=21.5b2"
@@ -38,9 +40,9 @@ pytest = ">=6.2.4"
 #volttron-testing = ">=0.3.1a7"
 #mypy = ">=0.982"
 
-[tool.poetry.dev-dependencies]
-ipython = "^7.29.0"
-mypy = "0.910"
-flake8 = "4.0.1"
-dunamai = "^1.7.0"
-commitizen = "^2.20.3"
+#[tool.poetry.dev-dependencies]
+#ipython = "^7.29.0"
+#mypy = "0.910"
+#flake8 = "4.0.1"
+#dunamai = "^1.7.0"
+#commitizen = "^2.20.3"
