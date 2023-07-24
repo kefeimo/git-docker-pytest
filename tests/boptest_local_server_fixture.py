@@ -31,15 +31,25 @@ def retrieve_valid_venv_path(venv_dir: str = "", venv_name: str = ".venv", retry
             else:
                 venv_dir_new = _get_random_venv_dir()
                 print(f"`{venv_dir}` is NOT a valid venv dir, trying new dir `{venv_dir_new}`")
-                return retrieve_valid_venv_path(venv_dir_new, venv_name, retry - 1)
+                cmd = f"python -m venv {venv_name} {venv_dir_new}/{venv_name}"
+                res = subprocess.check_output(cmd.split(" "))
+                print(res)
+                return venv_dir_new
+
+
 
         else:
             venv_dir_new = _get_random_venv_dir()
             print(f"`{venv_dir}` does NOT exist, creating new dir at `{venv_dir_new}`")
-            cmd = f"python -m venv {venv_name} {venv_dir_new}/{venv_name}"
-            res = subprocess.check_output(cmd.split(" "))
-            print(res)
-            return venv_dir_new
+
+            try:
+                os.mkdir(venv_dir)
+                return retrieve_valid_venv_path(venv_dir, venv_name, retry - 1)
+            except Exception as e:
+                print(e)
+                venv_dir_new = _get_random_venv_dir()
+                print(f"{venv_dir} does NOT work, trying new dir {venv_dir_new}")
+                return retrieve_valid_venv_path(venv_dir_new, venv_name, retry - 1)
 
 
 # def create_venv(venv_dir: str = None):
@@ -118,16 +128,29 @@ def retrieve_valid_repo_path(repo_dir: str, git_url: str, retry=5):
             else:
                 repo_dir_new = _get_random_repo_dir()
                 print(f"{repo_dir} is NOT a valid repo dir, trying new dir {repo_dir_new}")
-                return retrieve_valid_repo_path(repo_dir_new, git_url, retry - 1)
+                repo = Repo.clone_from(git_url, repo_dir_new)
+                assert not repo.bare
+                print(f"Cloning from {git_url} to new dir {repo_dir_new}")
+                # return repo.git_dir  # this has /.git/ at the end
+                return repo_dir_new
+
 
         else:
-            repo_dir_new = _get_random_repo_dir()
-            print(f"{repo_dir} does NOT exist, creating new dir {repo_dir_new}")
-            repo = Repo.clone_from(git_url, repo_dir_new)
-            assert not repo.bare
-            print(f"Cloning from {git_url} to new dir {repo_dir_new}")
-            # return repo.git_dir  # this has /.git/ at the end
-            return repo_dir_new
+            # repo_dir_new = _get_random_repo_dir()
+            print(f"{repo_dir} does NOT exist, creating new dir {repo_dir}")
+            # repo = Repo.clone_from(git_url, repo_dir_new)
+            # assert not repo.bare
+            # print(f"Cloning from {git_url} to new dir {repo_dir_new}")
+            # # return repo.git_dir  # this has /.git/ at the end
+            # return repo_dir_new
+            try:
+                os.mkdir(repo_dir)
+                return retrieve_valid_repo_path(repo_dir, git_url, retry - 1)
+            except Exception as e:
+                print(e)
+                repo_dir_new = _get_random_repo_dir()
+                print(f"{repo_dir} does NOT work, trying new dir {repo_dir_new}")
+                return retrieve_valid_repo_path(repo_dir_new, git_url, retry - 1)
 
 
 def start_boptest_server(repo_dir: str, venv_bin_path: str, testcase_name="testcase1", ):
@@ -197,7 +220,7 @@ if __name__ == "__main__":
     # os.mkdir(repo_dir)
     repo_dir = "/tmp/random-repo6f5ee697-de48-4288-88b8-4f62f18a5e4c"
     repo_dir = ""
-    repo_dir = "/tmp/random-repo3904b7e7-4e49-47da-aa39-da061ea3ff15/"
+    # repo_dir = "/tmp/random-repo3904b7e7-4e49-47da-aa39-da061ea3ff15/"
 
     valid_repo_dir = retrieve_valid_repo_path(repo_dir=repo_dir, git_url=git_url)
     print(valid_repo_dir)
@@ -211,4 +234,4 @@ if __name__ == "__main__":
     sleep(5)
 
     # stop boptest
-    stop_boptest_server(repo_dir=repo_dir, venv_bin_path=venv_bin_path)
+    stop_boptest_server(repo_dir=valid_repo_dir, venv_bin_path=venv_bin_path)

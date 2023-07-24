@@ -54,7 +54,7 @@ def boptest_sever():
     yield container_id
 
     ## stop boptest
-    stop_boptest_server(repo_dir, venv_bin_path)
+    stop_boptest_server(valid_repo_dir, venv_bin_path)
 
 
 def test_boptest_server_fixture(boptest_sever):
