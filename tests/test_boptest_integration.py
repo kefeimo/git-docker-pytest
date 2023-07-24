@@ -18,7 +18,7 @@ client = docker.from_env()
 # TODO: use parametrize with fixture instead
 # Note: by specifying specific REPO_DIR
 REPO_DIR = "/tmp/random-repo6f5ee697-de48-4288-88b8-4f62f18a5e4c"
-# REPO_DIR = ""
+REPO_DIR = ""
 VENV_DIR = "/tmp/random-env-3046c3b0-8641-46dc-be44-75141f666ff1/"
 VENV_DIR = ""
 TEST_CASE = "testcase1"
@@ -60,11 +60,13 @@ def boptest_sever():
 def test_boptest_server_fixture(boptest_sever):
     container_id = boptest_sever
     container = client.containers.get(container_id)
+    print("=====================")
     print(container.attrs)
 
     # verify testcase_name
     cmd = f"curl http://127.0.0.1:5000/name"
     res = subprocess.check_output(cmd.split(" "))
+    print("=====================")
     print(res)
 
 
