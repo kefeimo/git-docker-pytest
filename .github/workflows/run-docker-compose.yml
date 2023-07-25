@@ -1,4 +1,4 @@
-name: Run Boptest
+name: Run Docker Compose
 
 on:
   release:
@@ -15,7 +15,7 @@ env:
 
 jobs:
 
-  run-boptest:
+  run-docker-compose:
     strategy:
       matrix:
         os: ["ubuntu-22.04"]
@@ -40,63 +40,73 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-#      - name: Git clone Testing Repo
-#        uses: GuillaumeFalourd/clone-github-repo-action@v2
-#        with:
-#          depth: 1
-#          owner: 'kefeimo'
-#          repository: 'git-docker-pytest'
-#
-#      - name: validate repo
-#        run: |
-#          ls -la git-docker-pytest
-#          ls -la git-docker-pytest/examples
-#          ls -la git-docker-pytest/examples/docker-compose-example
-#
-#      - name: run docker-compose repo
-##        uses: actions/checkout@v3
+      - name: Git clone Testing Repo
+        uses: GuillaumeFalourd/clone-github-repo-action@v2
+        with:
+          depth: 1
+          owner: 'kefeimo'
+          repository: 'git-docker-pytest'
+
+      - name: validate repo
+        run: |
+          ls -la git-docker-pytest
+          ls -la git-docker-pytest/examples
+          ls -la git-docker-pytest/examples/docker-compose-example
+
+      - name: install docker-compose
+        run: |
+          sudo curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+
+      - name: run docker-compose repo
+#        uses: actions/checkout@v3
 #        uses: isbang/compose-action@v1.5.0
 #        with:
 #          compose-file: "./git-docker-pytest/examples/docker-compose-example/docker-compose.yml"
 #        env:
 #          TESTCASE: "testcase1"
-#
-#      - name: validate docker-compose
-#        run: |
-#          curl localhost:8000
-#          curl localhost:8000
-#          echo $TESTCASE
-          
-
-      ##### the real deal
-      - name: Git clone Boptest Repo
-        uses: GuillaumeFalourd/clone-github-repo-action@v2
-        with:
-          depth: 1
-          owner: 'ibpsa'
-          repository: 'project1-boptest'
-
-      - name: validate repo
-        run:
-          ls -la project1-boptest
-
-#      - name: setup environment variable
-#        run:
-#          export
-
-
-      - name: run docker-compose repo
-#      - uses: actions/checkout@v3
-        uses: isbang/compose-action@v1.5.0
-        with:
-          compose-file: "./project1-boptest/docker-compose.yml"
-        env:
-          TESTCASE: "testcase1"
+        run: |
+          echo --- Running test cases ---
+          docker-compose -f  ./git-docker-pytest/examples/docker-compose-example/docker-compose.yml  \
+          up -d
+          echo --- Completed test cases ---
 
       - name: validate docker-compose
         run: |
-          curl http://127.0.0.1:5000/measurements
-          curl http://127.0.0.1:5000/name
+          curl localhost:8000
+          curl localhost:8000
+          echo $TESTCASE
+          
+
+#      ##### the real deal
+#      - name: Git clone Boptest Repo
+#        uses: GuillaumeFalourd/clone-github-repo-action@v2
+#        with:
+#          depth: 1
+#          owner: 'ibpsa'
+#          repository: 'project1-boptest'
+#
+#      - name: validate repo
+#        run:
+#          ls -la project1-boptest
+#
+##      - name: setup environment variable
+##        run:
+##          export
+#
+#
+#      - name: run docker-compose repo
+##      - uses: actions/checkout@v3
+#        uses: isbang/compose-action@v1.5.0
+#        with:
+#          compose-file: "./project1-boptest/docker-compose.yml"
+#        env:
+#          TESTCASE: "testcase1"
+#
+#      - name: validate docker-compose
+#        run: |
+#          curl http://127.0.0.1:5000/measurements
+#          curl http://127.0.0.1:5000/name
 
 
 
