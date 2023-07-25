@@ -9,6 +9,7 @@ import docker
 from pathlib import Path
 
 client = docker.from_env()
+VENV_NAME = ".env"
 
 
 def check_directory_permissions(directory_path):
@@ -20,7 +21,7 @@ def check_directory_permissions(directory_path):
         return False
 
 
-def _is_venv_dir(path, venv_name=".venv"):
+def _is_venv_dir(path, venv_name=VENV_NAME):
     activate_path = os.path.join(path, venv_name, "bin/activate")
     # cmd = f"source {activate_path}"
     print(f"Check path {activate_path}")
@@ -63,7 +64,7 @@ def _get_random_venv_dir():
 
 def _create_venv(venv_dir):
     print("======= creating venv =======")
-    venv_name: str = ".venv"
+    venv_name: str = VENV_NAME
     if os.path.exists(venv_dir) and check_directory_permissions(venv_dir):
         print(f"`{venv_dir}` exists")
     else:
@@ -99,7 +100,7 @@ def retrieve_valid_venv_path(venv_dir: str = None, ):
     elif _is_venv_dir(venv_dir, ):
         print(f"`{venv_dir}` is a valid venv dir")
     else:
-        print(f"`{venv_dir}/.venv` does NOT exist.")
+        print(f"`{venv_dir}/<venv_name>` does NOT exist.")
         venv_dir = _create_venv(venv_dir)
 
     return venv_dir
@@ -119,7 +120,7 @@ def retrieve_valid_venv_path(venv_dir: str = None, ):
 #     return retrieve_valid_venv_path(venv_dir=venv_dir)
 
 
-def _get_bin_path(venv_dir: str = None, venv_name=".venv"):
+def _get_bin_path(venv_dir: str = None, venv_name=VENV_NAME):
     valid_venv_dir = retrieve_valid_venv_path(venv_dir)
     return os.path.join(valid_venv_dir, venv_name, "bin")
 
