@@ -1,0 +1,93 @@
+name: Run Boptest
+
+on:
+  release:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  LANG: en_US.utf-8
+  LC_ALL: en_US.utf-8
+  PYTHON_VERSION: '3.10'
+
+jobs:
+
+  run-boptest:
+    strategy:
+      matrix:
+        os: ["ubuntu-22.04"]
+        python: ["3.10"]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python }}
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Git clone Boptest Repo
+        uses: GuillaumeFalourd/clone-github-repo-action@v2
+        with:
+          depth: 1
+          owner: 'kefeimo'
+          repository: 'git-docker-pytest'
+
+      - name: validate repo
+        run: |
+          ls -la git-docker-pytest
+          ls -la git-docker-pytest/examples
+          ls -la git-docker-pytest/examples
+
+      - name: run docker-compose repo
+#        uses: actions/checkout@v3
+        uses: isbang/compose-action@v1.5.0
+        with:
+          compose-file: "./git-docker-pytest/examples/docker-compose-example/docker-compose.yml"
+        env:
+          TESTCASE: "testcase1"
+
+      - name: validate docker-compose
+        run: |
+          curl localhost:8000
+          curl localhost:8000
+          echo $TESTCASE
+
+
+
+#      - name: Set up Boptest
+#        uses: isbang/compose-action@v1.5.0
+#        with:
+#          compose-file: "./docker/docker-compose.yml"
+
+#      #----------------------------------------------
+#      #  -----  install & configure poetry  -----
+#      #----------------------------------------------
+#      - name: Install Poetry
+#        uses: snok/install-poetry@v1
+#        with:
+#          virtualenvs-create: true
+#          virtualenvs-in-project: true
+#          installer-parallel: true
+#
+#      #----------------------------------------------
+#      # install your root project, and run tests.
+#      #----------------------------------------------
+#      - name: Install library and run tests
+#        run: |
+#          poetry install --no-interaction
+#          poetry run pytest
