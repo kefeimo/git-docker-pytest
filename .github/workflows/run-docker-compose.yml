@@ -60,19 +60,20 @@ jobs:
 
       - name: run docker-compose repo
 #        uses: actions/checkout@v3
-#        uses: isbang/compose-action@v1.5.0
-#        with:
-#          compose-file: "./git-docker-pytest/examples/docker-compose-example/docker-compose.yml"
-#        env:
-#          TESTCASE: "testcase1"
-        run: |
-          echo --- Running test cases ---
-          docker-compose -f  ./git-docker-pytest/examples/docker-compose-example/docker-compose.yml  \
-          up -d
-          echo --- Completed test cases ---
+        uses: isbang/compose-action@v1.5.0
+        with:
+          compose-file: "./git-docker-pytest/examples/docker-compose-example/docker-compose.yml"
+        env:
+          TESTCASE: "testcase1"
+#        run: |
+#          echo --- Running test cases ---
+#          docker-compose -f  ./git-docker-pytest/examples/docker-compose-example/docker-compose.yml  \
+#          up -d
+#          echo --- Completed test cases ---
 
       - name: validate docker-compose
         run: |
+          sleep 10
           curl localhost:8000
           curl localhost:8000
           echo $TESTCASE
